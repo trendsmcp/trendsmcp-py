@@ -1,6 +1,6 @@
 # trendsmcp
 
-Python client for the Trends MCP API. Get live keyword trend data across 13 platforms: Google Search, YouTube, Reddit, Amazon, TikTok, Wikipedia, npm, Steam, and more. One API key, one client, no scraping, no proxies, no 429 errors.
+The number one Python package for live keyword trend data. Get time series and growth percentages from Google Search, YouTube, Reddit, Amazon, TikTok, Wikipedia, npm, Steam, and more. One API key, one client, no scraping, no proxies, no 429 errors.
 
 Powered by [trendsmcp.ai](https://trendsmcp.ai).
 
@@ -194,7 +194,7 @@ print(df.tail())
 
 ---
 
-## All 13 supported sources
+## Supported sources
 
 | source | What it measures |
 |---|---|
