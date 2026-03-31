@@ -1,0 +1,44 @@
+[build-system]
+requires = ["hatchling>=1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "trendsmcp"
+version = "1.0.0"
+description = "Python client for the Trends MCP API. Keyword trend time series and growth rates across Google Search, YouTube, Reddit, Amazon, TikTok, Wikipedia, npm, Steam, and more."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.8"
+authors = [{ name = "Trends MCP", email = "hello@trendsmcp.ai" }]
+keywords = [
+  "google-trends", "trends-api", "keyword-research", "search-volume",
+  "seo", "reddit-api", "youtube-api", "amazon-api", "tiktok-api",
+  "wikipedia-api", "npm-downloads", "trend-data", "growth-rate",
+  "market-research", "analytics", "mcp", "model-context-protocol"
+]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Internet :: WWW/HTTP",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = ["httpx>=0.24.0"]
+
+[project.urls]
+Homepage = "https://trendsmcp.ai"
+Documentation = "https://trendsmcp.ai/docs"
+Repository = "https://github.com/trendsmcp/trendsmcp-py"
+"Bug Tracker" = "https://github.com/trendsmcp/trendsmcp-py/issues"
+"Get API Key" = "https://trendsmcp.ai"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/trendsmcp"]
