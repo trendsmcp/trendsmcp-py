@@ -1,14 +1,24 @@
 # trendsmcp
 
-The number one Python package for live keyword trend data. Get time series and growth percentages from Google Search, YouTube, Reddit, Amazon, TikTok, Wikipedia, npm, Steam, and more. One API key, one client, no scraping, no proxies, no 429 errors.
+[![PyPI version](https://img.shields.io/pypi/v/trendsmcp.svg)](https://pypi.org/project/trendsmcp/)
+[![Python versions](https://img.shields.io/pypi/pyversions/trendsmcp.svg)](https://pypi.org/project/trendsmcp/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/trendsmcp/trendsmcp-py/blob/main/LICENSE)
+
+The number one Python client for live keyword trend data. Time series and growth percentages from Google Search, YouTube, Reddit, Amazon, TikTok, Wikipedia, npm, Steam, and more. One API key. No scraping. No proxies. No 429 errors.
+
+Works as a **Python API client** in any script, notebook, or pipeline. Also works as an **MCP tool** — plug it directly into Claude, Cursor, VS Code Copilot, or any MCP-compatible AI host.
 
 Powered by [trendsmcp.ai](https://trendsmcp.ai).
 
-**[Get a free API key](https://trendsmcp.ai)** - 100 requests/month, no credit card.
+**[Get a free API key](https://trendsmcp.ai)** — 100 requests/month, no credit card.
 
 **[Full API docs](https://trendsmcp.ai/docs)**
 
-Works with Python 3.8 through 3.13.
+---
+
+## Requirements
+
+Python 3.8 or later. Depends on `httpx`.
 
 ---
 
@@ -22,10 +32,17 @@ pip install trendsmcp
 
 ## Connect
 
+Store your API key in an environment variable:
+
+```bash
+export TRENDSMCP_API_KEY="your-api-key"
+```
+
 ```python
+import os
 from trendsmcp import TrendsMcpClient
 
-client = TrendsMcpClient(api_key="YOUR_API_KEY")
+client = TrendsMcpClient(api_key=os.environ["TRENDSMCP_API_KEY"])
 ```
 
 Get your key at [trendsmcp.ai](https://trendsmcp.ai).
@@ -34,9 +51,14 @@ Get your key at [trendsmcp.ai](https://trendsmcp.ai).
 
 ## get_trends
 
-Returns a weekly time series for a keyword (5 years by default). Pass `data_mode="daily"` for the last 30 days at daily granularity.
+Returns a weekly time series for a keyword. Default is 5 years of weekly data. Pass `data_mode="daily"` for the last 30 days at daily granularity.
 
 ```python
+import os
+from trendsmcp import TrendsMcpClient
+
+client = TrendsMcpClient(api_key=os.environ["TRENDSMCP_API_KEY"])
+
 series = client.get_trends(source="google search", keyword="bitcoin")
 
 print(series[0])
@@ -51,18 +73,18 @@ series = client.get_trends(source="youtube", keyword="bitcoin", data_mode="daily
 
 **Parameters**
 
-| Parameter | Type | Description |
-|---|---|---|
-| `source` | str | Data source (see full list below) |
-| `keyword` | str | Keyword to look up |
-| `data_mode` | str | `"weekly"` (default) or `"daily"` |
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `source` | str | Yes | Data source (see supported sources below) |
+| `keyword` | str | Yes | Keyword to query |
+| `data_mode` | str | No | `"weekly"` (default) or `"daily"` |
 
-**Returns** a list of `TrendsDataPoint` objects:
+**Response fields**
 
 | Field | Type | Description |
 |---|---|---|
 | `date` | str | ISO date string |
-| `value` | float | Normalized value 0-100 |
+| `value` | float | Normalized value 0 to 100 |
 | `volume` | float or None | Absolute volume estimate where available |
 | `keyword` | str | The keyword queried |
 | `source` | str | The data source |
@@ -71,28 +93,31 @@ series = client.get_trends(source="youtube", keyword="bitcoin", data_mode="daily
 
 ## get_growth
 
-Returns period-over-period growth for a keyword. Pass preset strings or custom date pairs.
+Returns period-over-period growth percentages for a keyword.
 
 ```python
 growth = client.get_growth(
     source="google search",
-    keyword="nike",
+    keyword="bitcoin",
     percent_growth=["3M", "12M", "YTD"],
 )
 
-print(growth.results[0])
-# GrowthResult(period='3M', growth=14.5, direction='increase', ...)
-
 for r in growth.results:
     print(f"{r.period}: {r.growth:+.1f}% ({r.direction})")
+# 3M: +8.2% (increase)
+# 12M: +31.4% (increase)
+# YTD: +14.5% (increase)
 ```
 
 **Growth presets:** `7D` `14D` `30D` `1M` `2M` `3M` `6M` `9M` `12M` `1Y` `18M` `24M` `2Y` `36M` `3Y` `48M` `60M` `5Y` `MTD` `QTD` `YTD`
 
-**Custom date ranges:**
+Custom date ranges:
 
 ```python
 from trendsmcp import TrendsMcpClient, CustomGrowthPeriod
+import os
+
+client = TrendsMcpClient(api_key=os.environ["TRENDSMCP_API_KEY"])
 
 growth = client.get_growth(
     source="amazon",
@@ -103,15 +128,6 @@ growth = client.get_growth(
 )
 ```
 
-**Parameters**
-
-| Parameter | Type | Description |
-|---|---|---|
-| `source` | str | Data source |
-| `keyword` | str | Keyword to look up |
-| `percent_growth` | list | List of preset strings or `CustomGrowthPeriod` objects |
-| `data_mode` | str | `"weekly"` (default) or `"daily"` |
-
 ---
 
 ## get_top_trends
@@ -119,36 +135,30 @@ growth = client.get_growth(
 Returns today's live trending items from platform feeds. Omit `type` to get all feeds at once.
 
 ```python
-# Single feed
 trending = client.get_top_trends(type="Google Trends", limit=10)
 print(trending.data)
 # [[1, 'tiger woods'], [2, 'miley cyrus'], ...]
 
 # All feeds at once
-all_trending = client.get_top_trends()
+all_feeds = client.get_top_trends()
 ```
 
 **Available feeds:** `Google Trends` `YouTube` `TikTok Trending Hashtags` `Reddit Hot Posts` `Amazon Best Sellers Top Rated` `App Store Top Free` `App Store Top Paid` `Wikipedia Trending` `Spotify Top Podcasts` `X (Twitter)`
 
-**Parameters**
-
-| Parameter | Type | Description |
-|---|---|---|
-| `type` | str | Feed name (omit for all feeds) |
-| `limit` | int | Max items per feed, up to 200 (default 50) |
-
 ---
 
-## Async support
+## Async
+
+All three methods are available on `AsyncTrendsMcpClient`. Run multiple platform queries concurrently:
 
 ```python
 import asyncio
+import os
 from trendsmcp import AsyncTrendsMcpClient
 
 async def main():
-    client = AsyncTrendsMcpClient(api_key="YOUR_API_KEY")
+    client = AsyncTrendsMcpClient(api_key=os.environ["TRENDSMCP_API_KEY"])
 
-    # Run multiple platforms concurrently
     google, youtube, reddit = await asyncio.gather(
         client.get_trends(source="google search", keyword="AI"),
         client.get_trends(source="youtube", keyword="AI"),
@@ -159,16 +169,15 @@ async def main():
 asyncio.run(main())
 ```
 
-All three methods (`get_trends`, `get_growth`, `get_top_trends`) have async equivalents on `AsyncTrendsMcpClient`.
-
 ---
 
 ## Error handling
 
 ```python
 from trendsmcp import TrendsMcpClient, TrendsMcpError
+import os
 
-client = TrendsMcpClient(api_key="YOUR_API_KEY")
+client = TrendsMcpClient(api_key=os.environ["TRENDSMCP_API_KEY"])
 
 try:
     series = client.get_trends(source="google search", keyword="bitcoin")
@@ -184,9 +193,10 @@ except TrendsMcpError as e:
 
 ```python
 import pandas as pd
+import os
 from trendsmcp import TrendsMcpClient
 
-client = TrendsMcpClient(api_key="YOUR_API_KEY")
+client = TrendsMcpClient(api_key=os.environ["TRENDSMCP_API_KEY"])
 series = client.get_trends(source="google search", keyword="bitcoin")
 df = pd.DataFrame([vars(p) for p in series])
 print(df.tail())
@@ -204,23 +214,23 @@ print(df.tail())
 | `"google shopping"` | Google Shopping purchase intent |
 | `"youtube"` | YouTube search volume |
 | `"tiktok"` | TikTok hashtag volume |
-| `"reddit"` | Reddit mention volume |
+| `"reddit"` | Reddit mention and discussion volume |
 | `"amazon"` | Amazon product search volume |
 | `"wikipedia"` | Wikipedia page views |
 | `"news volume"` | News article mention count |
-| `"news sentiment"` | News sentiment score |
+| `"news sentiment"` | News sentiment score (positive / negative) |
 | `"npm"` | npm package weekly downloads |
 | `"steam"` | Steam concurrent player count |
 
-All values are normalized 0 to 100 so you can compare across platforms directly.
+All values are normalized 0 to 100 so you can compare across sources directly. See [trendsmcp.ai/docs](https://trendsmcp.ai/docs) for the full and always up-to-date source list.
 
 ---
 
 ## Why not pytrends?
 
-pytrends scrapes Google and has been archived since 2023. It breaks regularly, returns 429 errors, requires proxies, and only covers Google Search with relative scores (0 to 100), no absolute volume.
+pytrends scrapes Google and has been archived since 2023. It breaks regularly, returns 429 errors, requires proxies, and only covers Google Search with relative scores. No absolute volume. No other platforms.
 
-trendsmcp is a managed REST API. No scraping, no 429s, no proxies required, 13 platforms, absolute volume estimates, and actively maintained.
+trendsmcp is a managed REST API. One key, all sources, no scraping, no 429s, actively maintained.
 
 ---
 
@@ -228,17 +238,17 @@ trendsmcp is a managed REST API. No scraping, no 429s, no proxies required, 13 p
 
 Platform-specific packages that expose the same client with a pre-set `SOURCE` constant:
 
-- [youtube-trends-api](https://pypi.org/project/youtube-trends-api/)
-- [reddit-trends-api](https://pypi.org/project/reddit-trends-api/)
-- [google-search-trends-api](https://pypi.org/project/google-search-trends-api/)
-- [amazon-trends-api](https://pypi.org/project/amazon-trends-api/)
-- [tiktok-trends-api](https://pypi.org/project/tiktok-trends-api/)
-- [wikipedia-trends-api](https://pypi.org/project/wikipedia-trends-api/)
-- [npm-trends-api](https://pypi.org/project/npm-trends-api/)
-- [steam-trends-api](https://pypi.org/project/steam-trends-api/)
-- [app-store-trends-api](https://pypi.org/project/app-store-trends-api/)
-- [news-volume-api](https://pypi.org/project/news-volume-api/)
-- [news-sentiment-api](https://pypi.org/project/news-sentiment-api/)
+- [youtube-trends-api](https://pypi.org/project/youtube-trends-api/) / [youtube-trends-mcp](https://pypi.org/project/youtube-trends-mcp/)
+- [reddit-trends-api](https://pypi.org/project/reddit-trends-api/) / [reddit-trends-mcp](https://pypi.org/project/reddit-trends-mcp/)
+- [google-search-trends-api](https://pypi.org/project/google-search-trends-api/) / [google-search-trends-mcp](https://pypi.org/project/google-search-trends-mcp/)
+- [amazon-trends-api](https://pypi.org/project/amazon-trends-api/) / [amazon-trends-mcp](https://pypi.org/project/amazon-trends-mcp/)
+- [tiktok-trends-api](https://pypi.org/project/tiktok-trends-api/) / [tiktok-trends-mcp](https://pypi.org/project/tiktok-trends-mcp/)
+- [wikipedia-trends-api](https://pypi.org/project/wikipedia-trends-api/) / [wikipedia-trends-mcp](https://pypi.org/project/wikipedia-trends-mcp/)
+- [npm-trends-api](https://pypi.org/project/npm-trends-api/) / [npm-trends-mcp](https://pypi.org/project/npm-trends-mcp/)
+- [steam-trends-api](https://pypi.org/project/steam-trends-api/) / [steam-trends-mcp](https://pypi.org/project/steam-trends-mcp/)
+- [app-store-trends-api](https://pypi.org/project/app-store-trends-api/) / [app-store-trends-mcp](https://pypi.org/project/app-store-trends-mcp/)
+- [news-volume-api](https://pypi.org/project/news-volume-api/) / [news-volume-mcp](https://pypi.org/project/news-volume-mcp/)
+- [news-sentiment-api](https://pypi.org/project/news-sentiment-api/) / [news-sentiment-mcp](https://pypi.org/project/news-sentiment-mcp/)
 
 ---
 
