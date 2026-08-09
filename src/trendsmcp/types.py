@@ -1,8 +1,8 @@
-"""Type definitions matching the Trends MCP API."""
+"""Type definitions matching the Trends MCP API (docs.trendsmcp.ai / llms.txt)."""
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import List, Literal, Optional, Union
 
 
@@ -18,6 +18,8 @@ TrendsSource = Literal[
     "wikipedia",
     "news volume",
     "news sentiment",
+    "app downloads",
+    "app rankings",
     "npm",
     "steam",
 ]
@@ -27,10 +29,12 @@ TrendsSource = Literal[
 class TrendsDataPoint:
     date: str
     value: float
-    volume: Optional[float]
     keyword: str
+    # Present for some sources (npm, app downloads, steam, …); omitted for others (e.g. google search).
+    volume: Optional[float] = None
     source: Optional[str] = None
     datatype: Optional[str] = None
+    volume_cumulative: Optional[float] = None
 
 
 @dataclass
@@ -40,7 +44,10 @@ class GetTrendsParams:
     data_mode: Optional[Literal["weekly", "daily"]] = None
 
 
+# Alias used in docs / npm client
+GetTimeSeriesParams = GetTrendsParams
 GetTrendsResponse = List[TrendsDataPoint]
+GetTimeSeriesResponse = GetTrendsResponse
 
 GrowthPreset = Literal[
     "7D", "14D", "30D",
@@ -61,7 +68,7 @@ class CustomGrowthPeriod:
 class GetGrowthParams:
     source: TrendsSource
     keyword: str
-    percent_growth: List[Union[GrowthPreset, CustomGrowthPeriod]]
+    percent_growth: Optional[List[Union[GrowthPreset, CustomGrowthPeriod]]] = None
     data_mode: Optional[Literal["weekly", "daily"]] = None
 
 
@@ -74,13 +81,16 @@ class GrowthResult:
     baseline_date: str
     recent_value: float
     baseline_value: float
-    volume_available: bool
-    recent_volume: Optional[float]
-    baseline_volume: Optional[float]
-    volume_growth: Optional[float]
+    volume_available: bool = False
+    recent_volume: Optional[float] = None
+    baseline_volume: Optional[float] = None
+    volume_growth: Optional[float] = None
     status: Optional[str] = None
     calculation_method: Optional[str] = None
+    growth_unit: Optional[str] = None
+    volume_estimated: Optional[bool] = None
     volume_direction: Optional[str] = None
+    volume_growth_omitted_reason: Optional[str] = None
 
 
 @dataclass
@@ -99,26 +109,36 @@ class GetGrowthResponse:
 
 
 TopTrendsFeed = Literal[
-    "Amazon Best Sellers Top Rated",
-    "App Store Top Free",
-    "App Store Top Paid",
-    "Google News RSS",
-    "Google Play",
     "Google Trends",
+    "Google News Top News",
+    "TikTok Trending Hashtags",
+    "TikTok Trending Searches",
+    "TikTok Shop Hot Products",
+    "YouTube Trending",
+    "X (Twitter) Trending",
     "Reddit Hot Posts",
     "Reddit World News",
-    "SimilarWeb Top Websites",
-    "Spotify Top Podcasts",
-    "TikTok Trending Hashtags",
     "Wikipedia Trending",
-    "X (Twitter)",
+    "Amazon Best Sellers Top Rated",
+    "Amazon Best Sellers by Category",
+    "App Store Top Free",
+    "App Store Top Paid",
+    "Google Play",
+    "Top Websites",
+    "Spotify Top Podcasts",
+    "Steam Most Played",
+    "GitHub Trending Repos",
+    "IMDb MOVIEmeter",
+    "Open Library Trending Books",
 ]
 
 
 @dataclass
 class GetTopTrendsParams:
     type: Optional[TopTrendsFeed] = None
+    category: Optional[str] = None
     limit: Optional[int] = None
+    offset: Optional[int] = None
 
 
 @dataclass
@@ -128,3 +148,4 @@ class GetTopTrendsResponse:
     limit: int
     count: int
     data: List[tuple]
+    offset: Optional[int] = None

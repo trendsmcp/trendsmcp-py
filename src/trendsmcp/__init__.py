@@ -2,31 +2,33 @@
 trendsmcp — Python client for the Trends MCP API.
 
 Keyword trend time series and growth rates across Google Search, YouTube,
-Reddit, Amazon, TikTok, Wikipedia, npm, Steam, and more.
+Reddit, Amazon, TikTok, Wikipedia, npm, Steam, app downloads, and more.
 
-Get your free API key at https://trendsmcp.ai
+Get your free API key at https://trendsmcp.ai/account?tab=signup
 Full docs at https://trendsmcp.ai/docs
 """
 
-from .client import TrendsMcpClient, AsyncTrendsMcpClient
+from .client import AsyncTrendsMcpClient, TrendsMcpClient
 from .exceptions import TrendsMcpError
 from .types import (
-    TrendsSource,
-    TrendsDataPoint,
-    GetTrendsParams,
-    GetTrendsResponse,
-    GrowthPreset,
     CustomGrowthPeriod,
     GetGrowthParams,
-    GrowthResult,
-    GrowthMetadata,
     GetGrowthResponse,
-    TopTrendsFeed,
+    GetTimeSeriesParams,
+    GetTimeSeriesResponse,
     GetTopTrendsParams,
     GetTopTrendsResponse,
+    GetTrendsParams,
+    GetTrendsResponse,
+    GrowthMetadata,
+    GrowthPreset,
+    GrowthResult,
+    TopTrendsFeed,
+    TrendsDataPoint,
+    TrendsSource,
 )
 
-__version__ = "1.0.2"
+__version__ = "1.1.0"
 __all__ = [
     "TrendsMcpClient",
     "AsyncTrendsMcpClient",
@@ -35,6 +37,8 @@ __all__ = [
     "TrendsDataPoint",
     "GetTrendsParams",
     "GetTrendsResponse",
+    "GetTimeSeriesParams",
+    "GetTimeSeriesResponse",
     "GrowthPreset",
     "CustomGrowthPeriod",
     "GetGrowthParams",

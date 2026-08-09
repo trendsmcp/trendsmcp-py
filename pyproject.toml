@@ -4,8 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "trendsmcp"
-version = "1.0.2"
-description = "Python client for the Trends MCP API. Keyword trend time series and growth rates across Google Search, YouTube, Reddit, Amazon, TikTok, Wikipedia, npm, Steam, and more."
+version = "1.1.0"
+description = "Python client for the Trends MCP API. Keyword trend time series and growth rates across Google Search, YouTube, Reddit, Amazon, TikTok, Wikipedia, npm, Steam, app downloads, and more."
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
@@ -38,7 +38,7 @@ Homepage = "https://trendsmcp.ai"
 Documentation = "https://trendsmcp.ai/docs"
 Repository = "https://github.com/trendsmcp/trendsmcp-py"
 "Bug Tracker" = "https://github.com/trendsmcp/trendsmcp-py/issues"
-"Get API Key" = "https://trendsmcp.ai"
+"Get API Key" = "https://trendsmcp.ai/account?tab=signup"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/trendsmcp"]
